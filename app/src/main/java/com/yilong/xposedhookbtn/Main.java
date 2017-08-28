@@ -1,18 +1,26 @@
 package com.yilong.xposedhookbtn;
 
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.lang.reflect.Field;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 
 public class Main implements IXposedHookLoadPackage {
+
+    private static final String PNAME = "com.android.mms";
 
     @Override
     public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
@@ -39,8 +47,6 @@ public class Main implements IXposedHookLoadPackage {
                                 ViewGroup.LayoutParams linearParams = linearLayout.getLayoutParams(); //取控件textView当前的布局参数
                                 linearParams.height = 0;
 
-//                                Log.i("ssssssss", " textView  = " + textView + "   linearLayout = " + linearLayout);
-
                             }
                         }
 //
@@ -50,27 +56,6 @@ public class Main implements IXposedHookLoadPackage {
                 }
 
             });
-
-//
-//            findAndHookConstructor(View.OnClickListener.class, new XC_MethodHook() {
-//                @Override
-//                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//
-//                    try {
-//                        View view = (View) param.args[0];
-//
-//                        view.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View view) {
-//
-//                            }
-//                        });
-//                        Log.i("ssssssss", " id  = " + view.getId());
-//                    } catch (Exception E) {
-//
-//                    }
-//                }
-//            });
 
 
 //            findAndHookMethod(Activity.class, "startActivity", Intent.class, new XC_MethodHook() {
@@ -104,6 +89,47 @@ public class Main implements IXposedHookLoadPackage {
 
 
         }
+
+//        if (lpparam.packageName.equals(PNAME)) {
+//
+//            final Class<?> clazz = XposedHelpers.findClass(
+//                    "com.android.mms.data.WorkingMessage", lpparam.classLoader);
+//
+//            XposedHelpers.findAndHookMethod(clazz, "send", String.class,
+//                    new XC_MethodHook() {
+//                        @Override
+//                        protected void beforeHookedMethod(MethodHookParam param)
+//                                throws Throwable {
+//
+//                            XposedBridge.log("----开始拦截send方法-------");
+//                            Field f = XposedHelpers.findField(clazz, "mText");
+//                            SpannableStringBuilder text = (SpannableStringBuilder) f.get(param.thisObject);
+//                            String origMsg = text.toString();
+//
+//                            Log.i("ssssssss", " origMsg  = " + origMsg);
+//                        }
+//                    });
+//
+//            XposedHelpers.findAndHookMethod("com.android.internal.telephony.gsm" + ".SmsMessage$PduParser",
+//                    lpparam.classLoader, "getUserDataUCS2", int.class,
+//                    new XC_MethodHook() {
+//                        @Override
+//                        protected void afterHookedMethod(MethodHookParam param)
+//                                throws Throwable {
+//                            try {
+//                                String strMms = (String) param.getResult();
+//                                XposedBridge.log("=========before:" + strMms);
+//                                //String after="666666666666666";
+//                                char[] recvArray = strMms.toCharArray();
+//
+//                            } catch (Exception e) {
+//                                XposedBridge.log(e);
+//                            }
+//
+//                        }
+//                    });
+//
+//        }
 
     }
 }
